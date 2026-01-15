@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+
+<a class="btn btn-sm btn-outline-secondary mb-3" href="/admin">← Back</a>
+
+<h3 class="mb-3">{% if mode=="new" %}New Record{% else %}Edit #{{ id }}{% endif %}</h3>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, msg in messages %}
+      <div class="alert alert-{{category}}">{{ msg }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form method="post" class="card shadow-sm">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Movie</label>
+        <input class="form-control" name="movie" value="{{ f.movie or '' }}" required>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Year</label>
+        <input class="form-control" name="year" type="number" value="{{ f.year or '' }}" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Release date (YYYY-MM-DD)</label>
+        <input class="form-control" name="release_date" value="{{ f.release_date or '' }}">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Director</label>
+        <input class="form-control" name="director" value="{{ f.director or '' }}">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Character</label>
+        <input class="form-control" name="character" value="{{ f.character or '' }}">
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Movie duration (HH:MM:SS)</label>
+        <input class="form-control" name="movie_duration" value="{{ f.movie_duration or '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Timestamp (HH:MM:SS)</label>
+        <input class="form-control" name="timestamp" value="{{ f.timestamp or '' }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Current wow</label>
+        <input class="form-control" name="current_wow_in_movie" type="number" value="{{ f.current_wow_in_movie or 1 }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Total wows</label>
+        <input class="form-control" name="total_wows_in_movie" type="number" value="{{ f.total_wows_in_movie or 1 }}">
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Full line</label>
+        <textarea class="form-control" name="full_line" rows="3">{{ f.full_line or '' }}</textarea>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Audio URL</label>
+        <input class="form-control" name="audio" value="{{ f.audio or '' }}">
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Image (Data URI base64)</label>
+        <textarea class="form-control font-monospace" name="image" rows="3" placeholder="data:image/...;base64,...">{{ f.image or '' }}</textarea>
+        <div class="form-text">Trebuie să rămână în format Data URI.</div>
+      </div>
+
+      <div class="col-12">
+        <div class="fw-semibold mb-2">Video links</div>
+        <div class="row g-2">
+          <div class="col-md-3">
+            <label class="form-label">1080p</label>
+            <input class="form-control" name="video_1080p" value="{{ f.video_1080p or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">720p</label>
+            <input class="form-control" name="video_720p" value="{{ f.video_720p or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">480p</label>
+            <input class="form-control" name="video_480p" value="{{ f.video_480p or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">360p</label>
+            <input class="form-control" name="video_360p" value="{{ f.video_360p or '' }}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer bg-white d-flex gap-2">
+    <button class="btn btn-primary">Save</button>
+    <a class="btn btn-outline-secondary" href="/admin">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}

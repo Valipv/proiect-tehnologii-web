@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="m-0">Admin Panel</h3>
+  <form method="post" action="/admin/logout">
+    <button class="btn btn-sm btn-outline-secondary">Logout ({{ admin_user }})</button>
+  </form>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, msg in messages %}
+      <div class="alert alert-{{category}}">{{ msg }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="d-flex gap-2 mb-3">
+  <a class="btn btn-primary" href="/admin/new">+ New</a>
+  <a class="btn btn-outline-secondary" href="/">Public site</a>
+</div>
+
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-8">
+    <input class="form-control" name="q" value="{{ q }}" placeholder="Search (movie/director/role/line)">
+  </div>
+  <div class="col-md-2">
+    <select class="form-select" name="per_page">
+      {% for n in [10,20,50,100] %}
+        <option value="{{n}}" {% if per_page==n %}selected{% endif %}>{{n}} / page</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 d-grid">
+    <button class="btn btn-outline-primary">Apply</button>
+  </div>
+</form>
+
+<div class="text-muted mb-2">Total: {{ total }} (pagina {{ page }} / {{ pages }})</div>
+
+<div class="table-responsive">
+  <table class="table table-sm table-striped align-middle">
+    <thead>
+      <tr>
+        <th>ID</th><th>Movie</th><th>Year</th><th>Role</th><th style="width:220px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for it in items %}
+      <tr>
+        <td>{{ it.id }}</td>
+        <td>{{ it.movie }}</td>
+        <td>{{ it.year }}</td>
+        <td>{{ it.role_name }}</td>
+        <td class="d-flex gap-2">
+          <a class="btn btn-sm btn-outline-secondary" href="/wows/{{ it.id }}">View</a>
+          <a class="btn btn-sm btn-outline-primary" href="/admin/edit/{{ it.id }}">Edit</a>
+          <form method="post" action="/admin/delete/{{ it.id }}" onsubmit="return confirm('Ștergi ID {{it.id}}?');">
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if pages > 1 %}
+<nav class="mt-3">
+  <ul class="pagination">
+    <li class="page-item {% if page<=1 %}disabled{% endif %}">
+      <a class="page-link" href="/admin?page={{page-1}}&per_page={{per_page}}&q={{q|urlencode}}">Prev</a>
+    </li>
+    <li class="page-item disabled"><span class="page-link">{{ page }} / {{ pages }}</span></li>
+    <li class="page-item {% if page>=pages %}disabled{% endif %}">
+      <a class="page-link" href="/admin?page={{page+1}}&per_page={{per_page}}&q={{q|urlencode}}">Next</a>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

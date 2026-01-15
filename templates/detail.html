@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a class="btn btn-sm btn-outline-secondary mb-3" href="/">← Înapoi</a>
+
+<div class="card shadow-sm mb-3">
+  {% if item.image_data_uri %}
+  <img
+    src="{{ item.image_data_uri }}"
+    class="card-img-top"
+    style="max-height:520px; object-fit:cover;"
+    alt="image"
+  />
+  {% endif %}
+
+  <div class="card-body">
+    <h4 class="mb-1">{{ item.movie }} ({{ item.year }})</h4>
+
+    <div class="text-muted mb-3">
+      Director: {{ item.director }} • Role: {{ item.role_name }} • Timestamp: {{ item.ts }}
+    </div>
+
+    {% if item.release_date or item.movie_duration %}
+    <div class="mb-2">
+      {% if item.release_date %}
+      <span class="badge text-bg-light border">Release: {{ item.release_date }}</span>
+      {% endif %}
+      {% if item.movie_duration %}
+      <span class="badge text-bg-light border">Duration: {{ item.movie_duration }}</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if item.current_wow_in_movie or item.total_wows_in_movie %}
+    <div class="mb-3">
+      <span class="badge text-bg-warning">
+        Wow #{{ item.current_wow_in_movie }} / {{ item.total_wows_in_movie }}
+      </span>
+    </div>
+    {% endif %}
+
+    <div class="fw-semibold">Line</div>
+    <p class="mb-3" style="white-space: pre-wrap;">{{ item.full_line }}</p>
+
+    <div class="d-flex flex-wrap gap-2">
+      {% if item.audio %}
+      <a
+        class="btn btn-sm btn-outline-primary"
+        href="{{ item.audio }}"
+        target="_blank"
+        rel="noreferrer"
+      >Audio</a>
+      {% endif %}
+
+      {% if item.video_json %}
+      <span class="badge text-bg-light border align-self-center">Video available</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h5 class="mb-3">Video (links)</h5>
+    <div class="d-flex flex-wrap gap-2">
+        {% if item.video %}
+            {% for quality, url in item.video.items() %}
+                {% if url %}
+                    <a
+                        class="btn btn-sm btn-outline-success"
+                        href="{{ url }}"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        Video {{ quality }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <span class="text-muted">No video data.</span>
+        {% endif %}
+    </div>
+
+
+    <hr class="my-4" />
+
+    <h5 class="mb-3">Câmpuri (din view)</h5>
+    <div class="table-responsive">
+      <table class="table table-sm table-striped align-middle">
+        <tbody>
+          <tr><td class="fw-semibold" style="width:220px;">ID</td><td>{{ item.id }}</td></tr>
+          <tr><td class="fw-semibold">Movie</td><td>{{ item.movie }}</td></tr>
+          <tr><td class="fw-semibold">Year</td><td>{{ item.year }}</td></tr>
+          <tr><td class="fw-semibold">Director</td><td>{{ item.director }}</td></tr>
+          <tr><td class="fw-semibold">Role</td><td>{{ item.role_name }}</td></tr>
+          <tr><td class="fw-semibold">Timestamp</td><td>{{ item.ts }}</td></tr>
+          <tr><td class="fw-semibold">Release date</td><td>{{ item.release_date }}</td></tr>
+          <tr><td class="fw-semibold">Movie duration</td><td>{{ item.movie_duration }}</td></tr>
+          <tr><td class="fw-semibold">Current wow in movie</td><td>{{ item.current_wow_in_movie }}</td></tr>
+          <tr><td class="fw-semibold">Total wows in movie</td><td>{{ item.total_wows_in_movie }}</td></tr>
+          <tr>
+            <td class="fw-semibold">Audio</td>
+            <td>
+              {% if item.audio %}
+                <a href="{{ item.audio }}" target="_blank" rel="noreferrer">{{ item.audio }}</a>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const videoBox = document.getElementById("video-links");
+if (!videoBox) return;
+
+videoBox.innerHTML = "";
+
+let raw = videoBox.dataset.video || null;
+let videoObj = null;
+
+try {
+  if (raw) videoObj = JSON.parse(raw);
+} catch (e) {
+  videoObj = null;
+}
+
+if (videoObj && typeof videoObj === "object") {
+  const entries = Object.entries(videoObj)
+    .filter(([_, url]) => url)
+    .sort((a, b) => parseInt(b[0], 10) - parseInt(a[0], 10));
+
+  if (!entries.length) {
+    videoBox.innerHTML = '<span class="text-muted">No video links.</span>';
+    return;
+  }
+
+  for (const [quality, url] of entries) {
+    const a = document.createElement("a");
+    a.className = "btn btn-sm btn-outline-success";
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noreferrer";
+    a.textContent = `Video ${quality}`;
+    videoBox.appendChild(a);
+  }
+} else {
+  videoBox.innerHTML = '<span class="text-muted">No video data.</span>';
+}
+
+</script>
+{% endblock %}

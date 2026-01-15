@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="mb-3">Listă “Wow”</h3>
+
+<form method="get" class="row g-2 align-items-center mb-3">
+  <div class="col-md-4">
+    <input class="form-control" name="q" value="{{ q }}" placeholder="Search (movie/director/role/line)">
+  </div>
+
+  <div class="col-md-3">
+    <select class="form-select js-select2" name="movie" data-placeholder="All movies">
+      <option value=""></option>
+      {% for m in movies %}
+        <option value="{{ m }}" {% if movie==m %}selected{% endif %}>{{ m }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <select class="form-select js-select2" name="year" data-placeholder="All years">
+      <option value=""></option>
+      {% for y in years %}
+        <option value="{{ y }}" {% if year|string==y|string %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <select class="form-select" name="per_page">
+      {% for n in [6,12,24,48] %}
+        <option value="{{n}}" {% if per_page==n %}selected{% endif %}>{{n}} / pagină</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-1 d-grid">
+    <button class="btn btn-primary">Go</button>
+  </div>
+</form>
+
+<div class="text-muted mb-2">Total: {{ total }} (pagina {{ page }} / {{ pages }})</div>
+
+<div class="row g-3">
+  {% for it in items %}
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        {% if it.image_data_uri %}
+          <img src="{{ it.image_data_uri }}" class="card-img-top" style="height:200px; object-fit:cover;">
+        {% endif %}
+        <div class="card-body">
+          <div class="small text-muted mb-1">{{ it.movie }} ({{ it.year }})</div>
+          <div class="fw-semibold">{{ it.role_name }}</div>
+          <div class="small text-muted mb-2">{{ it.director }}</div>
+          <div class="small">{{ it.full_line[:120] }}{% if it.full_line|length > 120 %}...{% endif %}</div>
+        </div>
+        <div class="card-footer bg-white border-0 pt-0">
+          <a class="btn btn-sm btn-primary" href="/wows/{{ it.id }}">Detalii</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% if pages > 1 %}
+<nav class="mt-4">
+  <ul class="pagination">
+    <li class="page-item {% if page<=1 %}disabled{% endif %}">
+      <a class="page-link"
+         href="/?page={{page-1}}&per_page={{per_page}}&q={{q|urlencode}}&movie={{movie|urlencode}}&year={{year}}">Prev</a>
+    </li>
+
+    <li class="page-item disabled"><span class="page-link">Pagina {{ page }} / {{ pages }}</span></li>
+
+    <li class="page-item {% if page>=pages %}disabled{% endif %}">
+      <a class="page-link"
+         href="/?page={{page+1}}&per_page={{per_page}}&q={{q|urlencode}}&movie={{movie|urlencode}}&year={{year}}">Next</a>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(function () {
+    $(".js-select2").each(function(){
+      const placeholder = $(this).data("placeholder") || "Select...";
+      $(this).select2({
+        placeholder: placeholder,
+        allowClear: true,
+        width: "100%"
+      });
+    });
+  });
+</script>
+{% endblock %}
